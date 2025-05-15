@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
+const Users = require("./models/user.model");
+require("./config/database");
 const app = express();
 
 app.set("view engine", "ejs");
@@ -19,9 +21,16 @@ app.get("/register", (req, res) => {
 });
 
 // user created
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   try {
-    res.send("user is created");
+    const users = await Users.findOne({ name: req.body.name });
+    if (users) {
+      res.send("user already existed");
+    } else {
+      const newUser = new Users(req.body);
+      await newUser.save();
+      res.redirect("/login");
+    }
   } catch (error) {
     res.send(error.message);
   }
