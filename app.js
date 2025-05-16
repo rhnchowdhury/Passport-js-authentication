@@ -78,16 +78,39 @@ app.post(
   })
 );
 
+const checkLogin = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return res.redirect("/profile");
+  }
+  next();
+};
+
 // login url: get
-app.get("/login", (req, res) => {
+app.get("/login", checkLogin, (req, res) => {
   res.render("login");
 });
 
 // logout url
 app.get("/logout", (req, res) => {
-  res.redirect("/");
+  try {
+    req.logOut((err) => {
+      if (err) {
+        return next(err);
+      } else {
+        res.redirect("/");
+      }
+    });
+  } catch (error) {
+    res.send(error.message);
+  }
 });
 
 // profile protected url
+app.get("/profile", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render("profile");
+  }
+  res.redirect("/login");
+});
 
 module.exports = app;
