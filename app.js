@@ -3,6 +3,8 @@ const cors = require("cors");
 const ejs = require("ejs");
 const Users = require("./models/user.model");
 require("./config/database");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const app = express();
 
 app.set("view engine", "ejs");
@@ -23,13 +25,19 @@ app.get("/register", (req, res) => {
 // user created
 app.post("/register", async (req, res) => {
   try {
-    const users = await Users.findOne({ name: req.body.name });
+    const users = await Users.findOne({ email: req.body.email });
     if (users) {
       res.send("user already existed");
     } else {
-      const newUser = new Users(req.body);
-      await newUser.save();
-      res.redirect("/login");
+      bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
+        const newUser = new Users({
+          name: req.body.name,
+          email: req.body.email,
+          password: hash,
+        });
+        await newUser.save();
+        res.redirect("/login");
+      });
     }
   } catch (error) {
     res.send(error.message);

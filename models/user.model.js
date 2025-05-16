@@ -7,9 +7,18 @@ const userSchema = new mongoose.Schema({
     require: true,
     unique: true,
   },
+  email: {
+    type: String,
+    require: true,
+    unique: true,
+  },
   password: {
     type: String,
     require: true,
+  },
+  createdOn: {
+    type: Date,
+    default: Date.now(),
   },
 });
 
