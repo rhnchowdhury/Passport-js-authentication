@@ -50,7 +50,7 @@ app.get("/register", (req, res) => {
 // user created
 app.post("/register", async (req, res) => {
   try {
-    const users = await Users.findOne({ email: req.body.email });
+    const users = await Users.findOne({ name: req.body.name });
     if (users) {
       res.send("user already existed");
     } else {
